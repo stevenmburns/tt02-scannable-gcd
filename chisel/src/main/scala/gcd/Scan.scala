@@ -30,7 +30,7 @@ class Scan(n : Int) extends ScanIfc(n) {
 }
 
 object MainScan extends App {
-  emitVerilog(new Scan(24))
+  emitVerilog(new Scan(32))
 }
 
 class ScanBinary(n : Int) extends ScanIfc(n) {
@@ -50,23 +50,29 @@ class ScanBinary(n : Int) extends ScanIfc(n) {
   val v = RegInit(0.U(n.W))
   val m = RegInit(1.U(n.W))
 
+  val isEven_u = isEven( u, m)
+  val isEven_v = isEven( v, m)
+
+
   when( io.ld) {
     u := (u << 1) | io.u_bit
     v := (v << 1) | io.v_bit
   } .elsewhen ( io.done) {
-  } .elsewhen ( isEven( u, m) && isEven( v, m)) {
+  } .elsewhen ( isEven_u && isEven_v) {
     m := m << 1
   } .otherwise {
-    val u0 = WireInit( u)
-    val v0 = WireInit( v)
+    val u0 = WireInit(u)
+    val v0 = WireInit(v)
+    val isEven_u0 = WireInit(isEven_u)
 
-    when ( !isEven( u, m) && ( isEven( v, m) || v > u)) {
+    when ( !isEven_u && ( isEven_v || v > u)) {
       u0 := v
       v0 := u
+      isEven_u0 := isEven_v
     }
 
     v := v0
-    when ( isEven( u0, m)) {
+    when (isEven_u0) {
       u := shiftRight( u0, m)
     } .otherwise {
       u := shiftRight( u0-v0, m)
