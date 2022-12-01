@@ -33,9 +33,6 @@ object MainScan extends App {
   emitVerilog(new Scan(32))
 }
 
-
-
-
 class ScanBinary(n : Int) extends ScanIfc(n) {
   def isEven( u : UInt, m : UInt) : Bool = (u & m) === 0.U
   def shiftRight( u : UInt, m : UInt) : UInt = ( u >> 1) & ~( m - 1.U)
