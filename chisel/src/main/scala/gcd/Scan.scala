@@ -35,7 +35,16 @@ object MainScan extends App {
 
 class ScanBinary(n : Int) extends ScanIfc(n) {
   def isEven( u : UInt, m : UInt) : Bool = (u & m) === 0.U
-  def shiftRight( u : UInt, m : UInt) : UInt = ( u >> 1) & ~( m - 1.U)
+  def shiftRight( u : UInt, m : UInt) : UInt = {
+    val mask_vec = m.asBools
+    val inv_mask_vec = Wire(Vec(n, Bool()))
+    inv_mask_vec(0) := mask_vec(0)
+    for { k <- 1 until n } {
+      inv_mask_vec(k) := mask_vec(k) | inv_mask_vec(k-1)
+    }
+    val inv_mask = inv_mask_vec.asUInt
+    ( u >> 1) & inv_mask
+  }
 
   val u = RegInit(0.U(n.W))
   val v = RegInit(0.U(n.W))
