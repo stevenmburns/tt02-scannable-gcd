@@ -1,6 +1,6 @@
 test_run_dir/
 target/
-
+.bsp/
 *.v
 *.anno.json
 *.fir

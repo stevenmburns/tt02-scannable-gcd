@@ -30,7 +30,7 @@ class Scan(n : Int) extends ScanIfc(n) {
 }
 
 object MainScan extends App {
-  emitVerilog(new Scan(32))
+  emitVerilog(new Scan(24))
 }
 
 class ScanBinary(n : Int) extends ScanIfc(n) {

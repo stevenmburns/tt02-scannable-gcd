@@ -11,4 +11,6 @@ ScanBinary u0(.clock(io_in[0]),
 	.io_z_bit(io_out[0]),
 	.io_done(io_out[1]));
 
+assign io_out[7:2] = 6'b0;
+
 endmodule

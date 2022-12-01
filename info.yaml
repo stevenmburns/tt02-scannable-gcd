@@ -16,7 +16,7 @@ project:
 documentation: 
   author:       "Steve Burns"      # Your name
   discord:      ""      # Your discord handle - make sure to include the # part as well
-  title:        "Chisel 24-bit GCD with scan in and out"      # Project title
+  title:        "Chisel 16-bit GCD with scan in and out"      # Project title
   description:  "Simple chisel based design based on Knuth's BinaryGDC algorithm using scan chains for I/O."
   how_it_works: "With the `ld` signal true, the `u_bit` and `v_bit` inputs are used to scan the `n`-bit numbers into the block. Simulataneously, the high-order bit of the `u` register is scanned out, allowing access to the result of the last computation. Upon lowering the `ld` signal, the Euclid iteration starts. When done, the `done` signal is raised."
   how_to_test:  "Chiseltest enabled tests. Go to `chisel` and run `sbt test`."
