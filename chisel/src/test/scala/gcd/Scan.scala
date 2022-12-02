@@ -6,18 +6,27 @@ import chisel3._
 import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chisel3.experimental.BundleLiterals._
+import scala.util.Random
+
+object Fib {
+  def apply(n: Int): BigInt =
+    ((0 until n).foldLeft((BigInt(0),BigInt(1))){
+      case ((f0,f1), _) => (f1,f0+f1)
+    })._1
+}
+
+object GCD {
+  @annotation.tailrec
+  def apply(u: BigInt, v: BigInt): BigInt =
+    if (v == 0) u else GCD(v, u % v)
+}
 
 class ScanTester(factory : () => ScanIfc) extends AnyFreeSpec with ChiselScalatestTester {
 
+  val rnd = new Random()
+
   "Gcd should calculate proper greatest common denominator" in {
     test(factory()) { dut =>
-      dut.reset.poke(true.B)
-      dut.io.ld.poke(false.B)
-      dut.clock.step()
-
-      dut.io.done.expect(true.B)
-
-      dut.reset.poke(false.B)
       dut.io.ld.poke(true.B)
 
       val n = dut.n
@@ -37,9 +46,15 @@ class ScanTester(factory : () => ScanIfc) extends AnyFreeSpec with ChiselScalate
 
         dut.io.ld.poke(false.B)
 
-        while (!dut.io.done.peek().litToBoolean) {
+        //println(s"Working on u = $u v = $v...")
+
+        var count = 0
+
+        while (!dut.io.done.peek().litToBoolean && count < 1000) {
           dut.clock.step()
+          count += 1
         }
+        //println(s"count $count")
 
         dut.io.ld.poke(true.B)
 
@@ -50,7 +65,7 @@ class ScanTester(factory : () => ScanIfc) extends AnyFreeSpec with ChiselScalate
           dut.clock.step()
         }
 
-        println(s"u = $u v = $v result = $result")
+        println(s"u = $u v = $v result = $result count = $count")
         result
 
       }
@@ -58,12 +73,23 @@ class ScanTester(factory : () => ScanIfc) extends AnyFreeSpec with ChiselScalate
 
       assert( example(3*4*5, 2*5) == 2*5)
 
-      assert( example(3*7*11*64, 13*3*7*128) == 3*7*64)
+      assert( example(Fib(10), Fib(11)) == GCD(10, 11))
+
+      for { _ <- 0 until 100 } {
+
+        val u = BigInt(n, rnd)
+        val v = BigInt(n, rnd)
+
+        assert(example(u, v) == GCD(u, v))
+
+      }
+
+
 
 
     }
   }
 }
 
-class ScanTest32 extends ScanTester(() => new Scan(32))
-class ScanBinaryTest32 extends ScanTester(() => new ScanBinary(32))
+class ScanTest12 extends ScanTester(() => new Scan(12))
+class ScanBinaryTest12 extends ScanTester(() => new ScanBinary(12))

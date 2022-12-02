@@ -45,25 +45,28 @@ class ScanBinary(n : Int) extends ScanIfc(n) {
     val inv_mask = inv_mask_vec.asUInt
     ( u >> 1) & inv_mask
   }
+  //def shiftRight( u : UInt, m : UInt) : UInt = (u>>1) & ~(m-1.U)
 
-  val u = RegInit(0.U(n.W))
-  val v = RegInit(0.U(n.W))
-  val m = RegInit(1.U(n.W))
+  val u = Reg(UInt(n.W))
+  val v = Reg(UInt(n.W))
+  val m = Reg(UInt(n.W))
 
-  val isEven_u = isEven( u, m)
-  val isEven_v = isEven( v, m)
+  val isEven_u = isEven(u, m)
+  val isEven_v = isEven(v, m)
 
-
-  when( io.ld) {
+  when(io.ld) {
     u := (u << 1) | io.u_bit
     v := (v << 1) | io.v_bit
-  } .elsewhen ( io.done) {
-  } .elsewhen ( isEven_u && isEven_v) {
+    m := 1.U
+  } .elsewhen (io.done) {
+  } .elsewhen (isEven_u && isEven_v) {
     m := m << 1
   } .otherwise {
     val u0 = WireInit(u)
     val v0 = WireInit(v)
     val isEven_u0 = WireInit(isEven_u)
+
+    printf("%x %x\n", u, v)
 
     when ( !isEven_u && ( isEven_v || v > u)) {
       u0 := v
@@ -84,5 +87,5 @@ class ScanBinary(n : Int) extends ScanIfc(n) {
 }
 
 object MainScanBinary extends App {
-  emitVerilog(new ScanBinary(16))
+  emitVerilog(new ScanBinary(12))
 }
